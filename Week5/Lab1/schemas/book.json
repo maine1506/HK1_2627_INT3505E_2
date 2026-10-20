@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Book input (POST and PUT)",
+  "type": "object", "additionalProperties": false,
+  "required": ["title", "isbn", "price_vnd", "stock", "category_id"],
+  "properties": {
+    "title": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "\\S"},
+    "isbn": {"type": "string", "pattern": "^[0-9]{13}$"},
+    "price_vnd": {"type": "integer", "minimum": 0},
+    "stock": {"type": "integer", "minimum": 0},
+    "category_id": {"type": "integer", "minimum": 1}
+  }
+}

@@ -1,0 +1,1 @@
+﻿-r ../Lab1/requirements.txt

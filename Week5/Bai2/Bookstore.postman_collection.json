@@ -1,0 +1,249 @@
+{
+  "info": {
+    "name": "Week5 Bai2 - Offset and Composite Cursor",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run in order against freshly seeded Bai2 (30 books; 10 tech). No writes."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5003/api/v1"
+    },
+    {
+      "key": "cursor",
+      "value": ""
+    },
+    {
+      "key": "lastCursor",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Offset + genre + multi-sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?strategy=offset&genre=tech&sort=-price,title&limit=4"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test(\"Filtered total and page size\", () => { pm.expect(b.pagination.total).to.eql(10); pm.expect(b.data.length).to.eql(4); });",
+              "pm.test(\"Only tech\", () => b.data.forEach(x => pm.expect(x.category.slug).to.eql(\"tech\")));",
+              "pm.collectionVariables.set(\"offsetIds\", JSON.stringify(b.data.map(x => x.id)));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Cursor first page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?strategy=cursor&genre=tech&sort=-price,title&limit=4"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test(\"Same order as offset\", () => pm.expect(b.data.map(x => x.id)).to.eql(JSON.parse(pm.collectionVariables.get(\"offsetIds\"))));",
+              "pm.test(\"Has next cursor\", () => { pm.expect(b.page.more).to.eql(true); pm.expect(b.page.next).to.be.a(\"string\"); });",
+              "pm.collectionVariables.set(\"cursor\", b.page.next);",
+              "pm.collectionVariables.set(\"firstIds\", JSON.stringify(b.data.map(x => x.id)));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Cursor second page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?strategy=cursor&genre=tech&sort=-price,title&limit=4&cursor={{cursor}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const b = pm.response.json(); const ids = JSON.parse(pm.collectionVariables.get(\"firstIds\"));",
+              "pm.test(\"No repeated IDs\", () => b.data.forEach(x => pm.expect(ids).not.to.include(x.id)));",
+              "pm.test(\"Four items\", () => pm.expect(b.data.length).to.eql(4));",
+              "pm.collectionVariables.set(\"lastCursor\", b.page.next);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Last page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?strategy=cursor&genre=tech&sort=-price,title&limit=4&cursor={{lastCursor}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test(\"End of collection\", () => { pm.expect(b.data.length).to.eql(2); pm.expect(b.page.more).to.eql(false); pm.expect(b.page.next).to.eql(null); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Reject changed sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?genre=tech&sort=price&cursor={{cursor}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Reject changed filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?genre=fiction&sort=-price,title&cursor={{cursor}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Reject malformed token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?cursor=broken"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Reject unknown sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?sort=foo"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Reject invalid limit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?limit=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Empty genre",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?genre=missing"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Empty final page\", () => { const b = pm.response.json(); pm.expect(b.data).to.eql([]); pm.expect(b.page.next).to.eql(null); pm.expect(b.page.more).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Limit cap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books?limit=999"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Cap at 100\", () => pm.expect(pm.response.json().page.limit).to.eql(100));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
