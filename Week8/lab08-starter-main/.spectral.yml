@@ -1,0 +1,64 @@
+extends: spectral:oas
+
+rules:
+  # This local teaching API has no published contact or tag catalogue.
+  info-contact: off
+  operation-tags: off
+  operation-description: off
+
+  operation-operationId: error
+
+  no-content-on-204:
+    description: A 204 response must not declare a body.
+    severity: error
+    given: "$..responses['204']"
+    then:
+      field: content
+      function: undefined
+
+  book-year-integer:
+    description: Book.year must match the integer model field.
+    severity: error
+    given: $.components.schemas.Book.properties.year
+    then:
+      field: type
+      function: enumeration
+      functionOptions:
+        values: [integer]
+
+  response-200-has-fields:
+    description: A JSON 200 response must define object fields, or array items with fields.
+    severity: error
+    resolved: true
+    given: "$..responses['200']"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required: [content]
+          properties:
+            content:
+              type: object
+              required: [application/json]
+              properties:
+                application/json:
+                  type: object
+                  required: [schema]
+                  properties:
+                    schema:
+                      type: object
+                      oneOf:
+                        - required: [type, properties]
+                          properties:
+                            type: {const: object}
+                            properties: {type: object, minProperties: 1}
+                        - required: [type, items]
+                          properties:
+                            type: {const: array}
+                            items:
+                              type: object
+                              required: [type, properties]
+                              properties:
+                                type: {const: object}
+                                properties: {type: object, minProperties: 1}

@@ -1,0 +1,7 @@
+
+c:/Users/Admin/AppData/Local/Temp/vscode-agent-codex-sandbox-Rj8wyu/lab02-tools/openapi-before.yaml
+  24:9   error  operation-operationId  Operation must have "operationId".             paths./books.get
+  95:19  error  no-content-on-204      A 204 response must not declare a body.        paths./books/{id}.delete.responses[204].content
+ 110:22  error  book-year-integer      Book.year must match the integer model field.  components.schemas.Book.properties.year.type
+
+✖ 3 problems (3 errors, 0 warnings, 0 infos, 0 hints)

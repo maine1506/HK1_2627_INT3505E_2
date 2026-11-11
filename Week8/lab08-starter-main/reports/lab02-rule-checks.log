@@ -1,0 +1,6 @@
+PASS: empty-schema rejected by response-200-has-fields
+PASS: empty-object-properties rejected by response-200-has-fields
+PASS: empty-array-items rejected by response-200-has-fields
+PASS: missing-schema rejected by response-200-has-fields
+PASS: empty-referenced-book-properties rejected by response-200-has-fields
+5/5 invalid schema cases rejected. Original spec was not modified.
