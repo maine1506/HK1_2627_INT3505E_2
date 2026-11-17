@@ -1,0 +1,63 @@
+newman
+
+Books API — Lab08 Starter
+
+Folder books
+Sub-folder GET /books — initial list
+  GET http://127.0.0.1:5000/books [200 OK, 168B, 58ms]
+  Pass  200 OK
+  Pass  body is array
+
+Sub-folder POST /books — create
+  POST http://127.0.0.1:5000/books [201 CREATED, 260B, 15ms]
+  Pass  201 Created
+  Pass  positive id
+
+Sub-folder GET /books/{id} — read
+  GET http://127.0.0.1:5000/books/1 [200 OK, 235B, 7ms]
+  Pass  200 OK
+  Pass  expected fields
+
+Sub-folder PUT /books/{id} — replace
+  PUT http://127.0.0.1:5000/books/1 [200 OK, 243B, 10ms]
+  Pass  200 OK
+  Pass  updated title
+
+Sub-folder DELETE /books/{id} — delete
+  DELETE http://127.0.0.1:5000/books/1 [204 NO CONTENT, 162B, 9ms]
+  Pass  204 No Content
+  Pass  empty body
+
+Folder error-cases
+Sub-folder POST /books - missing title
+  POST http://127.0.0.1:5000/books [400 BAD REQUEST, 308B, 14ms]
+  Pass  400 Bad Request
+  Pass  validation error code
+  Pass  validation message
+  Pass  errors identifies title
+
+Sub-folder GET /books/9999 - not found
+  GET http://127.0.0.1:5000/books/9999 [404 NOT FOUND, 221B, 7ms]
+  Pass  404 Not Found
+  Pass  not found code
+  Pass  not found message
+
+-----------------------------------------------------------------
+|                         |         executed |           failed |
+--------------------------+------------------+-------------------
+|              iterations |                1 |                0 |
+--------------------------+------------------+-------------------
+|                requests |                7 |                0 |
+--------------------------+------------------+-------------------
+|            test-scripts |                7 |                0 |
+--------------------------+------------------+-------------------
+|      prerequest-scripts |                0 |                0 |
+--------------------------+------------------+-------------------
+|              assertions |               17 |                0 |
+-----------------------------------------------------------------
+| total run duration: 911ms                                     |
+-----------------------------------------------------------------
+| total data received: 398B (approx)                            |
+-----------------------------------------------------------------
+| average response time: 17ms [min: 7ms, max: 58ms, s.d.: 16ms] |
+-----------------------------------------------------------------
