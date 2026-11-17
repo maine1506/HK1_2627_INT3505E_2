@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /books?year,CatchResponseError('SIMULATED_500: client-side injection (actual HTTP 200)'),1,2026-11-17T12:06:45Z,2026-11-17T12:06:45Z

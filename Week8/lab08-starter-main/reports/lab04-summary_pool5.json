@@ -1,0 +1,16 @@
+[
+  {
+    "case": "C_pool5",
+    "users": 200,
+    "spawn_rate": 50,
+    "duration": "30s",
+    "pool_size": 5,
+    "injection_probability": 0.01,
+    "requests": 2773,
+    "failures": 3,
+    "p95_ms": 280.0,
+    "failure_rate": 0.0010818608005769925,
+    "rps": 94.6148375505717,
+    "exit_code": 1
+  }
+]

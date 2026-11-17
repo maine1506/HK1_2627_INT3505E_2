@@ -1,0 +1,44 @@
+[
+  {
+    "case": "A",
+    "users": 10,
+    "spawn_rate": 2,
+    "duration": "30s",
+    "pool_size": 15,
+    "injection_probability": 0.01,
+    "requests": 134,
+    "failures": 0,
+    "p95_ms": 27.0,
+    "failure_rate": 0.0,
+    "rps": 4.733880136555935,
+    "exit_code": 0
+  },
+  {
+    "case": "B",
+    "users": 50,
+    "spawn_rate": 5,
+    "duration": "60s",
+    "pool_size": 15,
+    "injection_probability": 0.01,
+    "requests": 1361,
+    "failures": 1,
+    "p95_ms": 29.0,
+    "failure_rate": 0.0007347538574577516,
+    "rps": 23.28401060505943,
+    "exit_code": 1
+  },
+  {
+    "case": "C",
+    "users": 200,
+    "spawn_rate": 50,
+    "duration": "30s",
+    "pool_size": 15,
+    "injection_probability": 0.01,
+    "requests": 2801,
+    "failures": 4,
+    "p95_ms": 290.0,
+    "failure_rate": 0.0014280614066404856,
+    "rps": 95.60536051667546,
+    "exit_code": 1
+  }
+]

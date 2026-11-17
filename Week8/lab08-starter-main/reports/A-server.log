@@ -1,0 +1,3 @@
+QueuePool Pool size: 15  Connections in pool: 1 Current Overflow: -14 Current Checked out connections: 0
+ * Serving Flask app 'app'
+ * Debug mode: off
