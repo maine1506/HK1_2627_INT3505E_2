@@ -1,0 +1,70 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Practice 1 - User API Versioning", "version": "2.0.0"},
+  "servers": [{"url": "http://127.0.0.1:5000"}],
+  "paths": {
+    "/api/v1/users/{uid}": {
+      "get": {
+        "summary": "Get a user with full_name",
+        "parameters": [{"$ref": "#/components/parameters/UserId"}],
+        "responses": {
+          "200": {
+            "description": "User in v1 format",
+            "headers": {"Sunset": {"description": "Planned retirement date", "schema": {"type": "string", "example": "Thu, 31 Dec 2026 23:59:59 GMT"}}},
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserV1"}}}
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/v2/users/{uid}": {
+      "get": {
+        "summary": "Get a user with separate name fields",
+        "parameters": [{"$ref": "#/components/parameters/UserId"}],
+        "responses": {
+          "200": {"description": "User in v2 format", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserV2"}}}},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/api/v2/users": {
+      "post": {
+        "summary": "Create a user in the shared in-memory store",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateUser"}}}},
+        "responses": {
+          "201": {
+            "description": "User created",
+            "headers": {"Location": {"description": "URL for the new v2 user", "schema": {"type": "string"}}},
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UserV2"}}}
+          },
+          "400": {"description": "Malformed JSON, incorrect fields or empty/non-string values", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "415": {"description": "JSON content type required", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {"UserId": {"name": "uid", "in": "path", "required": true, "schema": {"type": "integer", "minimum": 0}}},
+    "responses": {"NotFound": {"description": "User not found", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}, "example": {"error": "nf"}}}}},
+    "schemas": {
+      "Error": {"type": "object", "required": ["error"], "properties": {"error": {"type": "string"}}},
+      "CreateUser": {
+        "type": "object", "additionalProperties": false,
+        "required": ["first_name", "last_name", "email"],
+        "properties": {
+          "first_name": {"type": "string", "minLength": 1, "pattern": "\\S", "example": "Văn"},
+          "last_name": {"type": "string", "minLength": 1, "pattern": "\\S", "example": "Nguyễn"},
+          "email": {"type": "string", "minLength": 1, "pattern": "\\S", "example": "a@vnu.vn"}
+        }
+      },
+      "UserV1": {
+        "type": "object", "additionalProperties": false, "required": ["id", "full_name", "email"],
+        "properties": {"id": {"type": "integer"}, "full_name": {"type": "string"}, "email": {"type": "string"}}
+      },
+      "UserV2": {
+        "type": "object", "additionalProperties": false, "required": ["id", "first_name", "last_name", "email"],
+        "properties": {"id": {"type": "integer"}, "first_name": {"type": "string"}, "last_name": {"type": "string"}, "email": {"type": "string"}}
+      }
+    }
+  }
+}
